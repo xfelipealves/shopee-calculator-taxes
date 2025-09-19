@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Taxas - Shopee</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-calculator"></i>
+                <h1>Calculadora de Taxas Shopee</h1>
+            </div>
+            <p class="subtitle">Calcule comissões e valor líquido para suas vendas</p>
+        </header>
+
+        <div class="calculator-wrapper">
+            <!-- Modo de Cálculo -->
+            <div class="mode-selector">
+                <h2>Modo de Cálculo</h2>
+                <div class="mode-buttons">
+                    <button id="mode-product-value" class="mode-btn active">
+                        <i class="fas fa-tag"></i>
+                        Valor do Produto
+                    </button>
+                    <button id="mode-net-value" class="mode-btn">
+                        <i class="fas fa-wallet"></i>
+                        Valor Líquido Desejado
+                    </button>
+                </div>
+            </div>
+
+            <!-- Formulário Principal -->
+            <form class="calculator-form" id="calculatorForm">
+                <!-- Modo: Valor do Produto -->
+                <div class="input-group" id="product-value-mode">
+                    <label for="productValue">
+                        <i class="fas fa-dollar-sign"></i>
+                        Valor do Produto (R$)
+                    </label>
+                    <input 
+                        type="number" 
+                        id="productValue" 
+                        step="0.01" 
+                        min="0" 
+                        placeholder="Ex: 100.00"
+                        required
+                    >
+                </div>
+
+                <!-- Modo: Valor Líquido Desejado -->
+                <div class="input-group hidden" id="net-value-mode">
+                    <label for="netValue">
+                        <i class="fas fa-wallet"></i>
+                        Valor Líquido Desejado (R$)
+                    </label>
+                    <input 
+                        type="number" 
+                        id="netValue" 
+                        step="0.01" 
+                        min="0" 
+                        placeholder="Ex: 76.00"
+                    >
+                </div>
+
+                <!-- Configurações -->
+                <div class="settings-section">
+                    <h3><i class="fas fa-cog"></i> Configurações</h3>
+                    
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="freeShipping">
+                            <span class="checkmark"></span>
+                            <i class="fas fa-truck"></i>
+                            Programa de Frete Grátis
+                        </label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="highVolumeSeller">
+                            <span class="checkmark"></span>
+                            <i class="fas fa-chart-line"></i>
+                            Vendedor CPF com +450 pedidos (90 dias)
+                        </label>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="highlightCampaign">
+                            <span class="checkmark"></span>
+                            <i class="fas fa-star"></i>
+                            Participando de Campanha de Destaque
+                        </label>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="quantity">
+                            <i class="fas fa-boxes"></i>
+                            Quantidade de Itens
+                        </label>
+                        <input 
+                            type="number" 
+                            id="quantity" 
+                            min="1" 
+                            value="1" 
+                            placeholder="1"
+                        >
+                    </div>
+                </div>
+
+                <button type="submit" class="calculate-btn">
+                    <i class="fas fa-calculator"></i>
+                    Calcular
+                </button>
+            </form>
+
+            <!-- Resultados -->
+            <div class="results-section" id="results" style="display: none;">
+                <h2><i class="fas fa-chart-pie"></i> Resultados</h2>
+                
+                <div class="results-grid">
+                    <div class="result-card primary">
+                        <div class="result-label">Valor do Produto</div>
+                        <div class="result-value" id="resultProductValue">R$ 0,00</div>
+                    </div>
+
+                    <div class="result-card secondary">
+                        <div class="result-label">Comissão Padrão (12%)</div>
+                        <div class="result-value" id="resultStandardCommission">R$ 0,00</div>
+                    </div>
+
+                    <div class="result-card secondary">
+                        <div class="result-label">Taxa de Transação (2%)</div>
+                        <div class="result-value" id="resultTransactionFee">R$ 0,00</div>
+                    </div>
+
+                    <div class="result-card secondary" id="resultShippingCard" style="display: none;">
+                        <div class="result-label">Taxa de Transporte (6%)</div>
+                        <div class="result-value" id="resultShippingFee">R$ 0,00</div>
+                    </div>
+
+                    <div class="result-card secondary">
+                        <div class="result-label">Taxa por Item Vendido</div>
+                        <div class="result-value" id="resultItemFee">R$ 0,00</div>
+                    </div>
+
+                    <div class="result-card secondary" id="resultCampaignCard" style="display: none;">
+                        <div class="result-label">Campanha de Destaque (2%)</div>
+                        <div class="result-value" id="resultCampaignFee">R$ 0,00</div>
+                    </div>
+
+                    <div class="result-card total-fees">
+                        <div class="result-label">Total de Comissões</div>
+                        <div class="result-value" id="resultTotalFees">R$ 0,00</div>
+                    </div>
+
+                    <div class="result-card net-value">
+                        <div class="result-label">Valor Líquido</div>
+                        <div class="result-value" id="resultNetValue">R$ 0,00</div>
+                    </div>
+                </div>
+
+                <div class="summary">
+                    <div class="summary-item">
+                        <span>Margem de Lucro:</span>
+                        <span id="profitMargin">0%</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Taxa Total:</span>
+                        <span id="totalTaxPercentage">0%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informações Adicionais -->
+        <div class="info-section">
+            <h3><i class="fas fa-info-circle"></i> Informações Importantes</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <h4>Limite de Comissão</h4>
+                    <p>A comissão total não pode ultrapassar R$ 100,00 por item.</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-tag"></i>
+                    <h4>Produtos Abaixo de R$ 8,00</h4>
+                    <p>A taxa por item será metade do valor do produto.</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-truck"></i>
+                    <h4>Frete Grátis</h4>
+                    <p>Adiciona 6% de taxa de transporte sobre o valor do produto.</p>
+                </div>
+                <div class="info-card">
+                    <i class="fas fa-star"></i>
+                    <h4>Campanhas</h4>
+                    <p>Campanhas de destaque adicionam 2% de taxa extra.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

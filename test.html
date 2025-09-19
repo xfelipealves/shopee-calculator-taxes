@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testes - Calculadora Shopee</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .test-result {
+            background: #e8f5e8;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #4caf50;
+        }
+        .test-error {
+            background: #ffe8e8;
+            border-left-color: #f44336;
+        }
+        .test-section {
+            margin-bottom: 30px;
+        }
+        .test-section h2 {
+            color: #333;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .test-case {
+            background: #f8f9fa;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #5a67d8;
+        }
+        .expected {
+            color: #666;
+            font-style: italic;
+        }
+        .actual {
+            color: #333;
+            font-weight: bold;
+        }
+        .status {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status.pass {
+            background: #4caf50;
+            color: white;
+        }
+        .status.fail {
+            background: #f44336;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Testes da Calculadora de Taxas Shopee</h1>
+    
+    <div class="test-container">
+        <button onclick="runAllTests()">▶️ Executar Todos os Testes</button>
+        <button onclick="clearResults()">🗑️ Limpar Resultados</button>
+    </div>
+
+    <div id="test-results"></div>
+
+    <script src="script.js"></script>
+    <script>
+        // Classe de testes
+        class CalculatorTests {
+            constructor() {
+                this.calculator = new ShopeeCalculator();
+                this.results = [];
+            }
+
+            runTest(testName, testFunction, expected = null) {
+                try {
+                    const result = testFunction();
+                    const passed = expected ? Math.abs(result - expected) < 0.01 : true;
+                    
+                    this.results.push({
+                        name: testName,
+                        passed: passed,
+                        result: result,
+                        expected: expected
+                    });
+
+                    return result;
+                } catch (error) {
+                    this.results.push({
+                        name: testName,
+                        passed: false,
+                        result: error.message,
+                        expected: expected
+                    });
+                    return null;
+                }
+            }
+
+            displayResults() {
+                const container = document.getElementById('test-results');
+                container.innerHTML = '';
+
+                const totalTests = this.results.length;
+                const passedTests = this.results.filter(r => r.passed).length;
+                const failedTests = totalTests - passedTests;
+
+                // Resumo
+                const summary = document.createElement('div');
+                summary.className = 'test-container';
+                summary.innerHTML = `
+                    <h2>📊 Resumo dos Testes</h2>
+                    <p><strong>Total:</strong> ${totalTests} testes</p>
+                    <p><strong>Aprovados:</strong> <span class="status pass">${passedTests}</span></p>
+                    <p><strong>Falharam:</strong> <span class="status fail">${failedTests}</span></p>
+                    <p><strong>Taxa de Sucesso:</strong> ${((passedTests / totalTests) * 100).toFixed(1)}%</p>
+                `;
+                container.appendChild(summary);
+
+                // Testes por categoria
+                const categories = {
+                    'Modo Valor do Produto': [],
+                    'Modo Valor Líquido': [],
+                    'Casos Especiais': [],
+                    'Validações': []
+                };
+
+                this.results.forEach(test => {
+                    if (test.name.includes('Produto R$')) {
+                        categories['Modo Valor do Produto'].push(test);
+                    } else if (test.name.includes('Líquido R$')) {
+                        categories['Modo Valor Líquido'].push(test);
+                    } else if (test.name.includes('Especial') || test.name.includes('Limite') || test.name.includes('Abaixo')) {
+                        categories['Casos Especiais'].push(test);
+                    } else {
+                        categories['Validações'].push(test);
+                    }
+                });
+
+                Object.entries(categories).forEach(([category, tests]) => {
+                    if (tests.length === 0) return;
+
+                    const section = document.createElement('div');
+                    section.className = 'test-section';
+                    
+                    const categoryPassed = tests.filter(t => t.passed).length;
+                    const categoryTotal = tests.length;
+                    
+                    section.innerHTML = `
+                        <h2>${category} <span class="status ${categoryPassed === categoryTotal ? 'pass' : 'fail'}">${categoryPassed}/${categoryTotal}</span></h2>
+                    `;
+
+                    tests.forEach(test => {
+                        const testDiv = document.createElement('div');
+                        testDiv.className = `test-case`;
+                        
+                        const statusClass = test.passed ? 'test-result' : 'test-result test-error';
+                        const statusText = test.passed ? '✅ PASSOU' : '❌ FALHOU';
+                        
+                        testDiv.innerHTML = `
+                            <div class="${statusClass}">
+                                <strong>${test.name}</strong> - ${statusText}
+                                ${test.expected ? `<br><span class="expected">Esperado: ${test.expected}</span>` : ''}
+                                <br><span class="actual">Resultado: ${test.result}</span>
+                            </div>
+                        `;
+                        
+                        section.appendChild(testDiv);
+                    });
+
+                    container.appendChild(section);
+                });
+            }
+
+            // Testes específicos
+            testProductValueMode() {
+                console.log('🧪 Testando Modo Valor do Produto...');
+
+                // Teste 1: Produto R$ 100 com frete grátis
+                this.runTest(
+                    'Produto R$ 100,00 com Frete Grátis',
+                    () => {
+                        const result = this.calculator.calculateFromProductValue({
+                            productValue: 100,
+                            freeShipping: true,
+                            highVolumeSeller: false,
+                            highlightCampaign: false,
+                            quantity: 1
+                        });
+                        return result.netValue;
+                    },
+                    76 // Esperado: 100 - (12 + 2 + 6 + 4) = 76
+                );
+
+                // Teste 2: Produto R$ 50 sem frete grátis
+                this.runTest(
+                    'Produto R$ 50,00 sem Frete Grátis',
+                    () => {
+                        const result = this.calculator.calculateFromProductValue({
+                            productValue: 50,
+                            freeShipping: false,
+                            highVolumeSeller: false,
+                            highlightCampaign: false,
+                            quantity: 1
+                        });
+                        return result.netValue;
+                    },
+                    39 // Esperado: 50 - (6 + 1 + 4) = 39
+                );
+
+                // Teste 3: Produto R$ 5,00 (abaixo de R$ 8,00)
+                this.runTest(
+                    'Produto R$ 5,00 (abaixo de R$ 8,00)',
+                    () => {
+                        const result = this.calculator.calculateFromProductValue({
+                            productValue: 5,
+                            freeShipping: false,
+                            highVolumeSeller: false,
+                            highlightCampaign: false,
+                            quantity: 1
+                        });
+                        return result.netValue;
+                    },
+                    1.8 // Esperado: 5 - (0.6 + 0.1 + 2.5) = 1.8
+                );
+
+                // Teste 4: Produto R$ 1000 (teste limite)
+                this.runTest(
+                    'Produto R$ 1.000,00 (teste limite R$ 100)',
+                    () => {
+                        const result = this.calculator.calculateFromProductValue({
+                            productValue: 1000,
+                            freeShipping: true,
+                            highVolumeSeller: false,
+                            highlightCampaign: false,
+                            quantity: 1
+                        });
+                        return result.netValue;
+                    },
+                    900 // Esperado: 1000 - 100 = 900 (limite aplicado)
+                );
+
+                // Teste 5: Vendedor CPF com +450 pedidos
+                this.runTest(
+                    'Produto R$ 100,00 - Vendedor CPF +450 pedidos',
+                    () => {
+                        const result = this.calculator.calculateFromProductValue({
+                            productValue: 100,
+                            freeShipping: false,
+                            highVolumeSeller: true,
+                            highlightCampaign: false,
+                            quantity: 1
+                        });
+                        return result.netValue;
+                    },
+                    81 // Esperado: 100 - (12 + 2 + 5) = 81
+                );
+
+                // Teste 6: Com campanha de destaque
+                this.runTest(
+                    'Produto R$ 100,00 com Campanha de Destaque',
+                    () => {
+                        const result = this.calculator.calculateFromProductValue({
+                            productValue: 100,
+                            freeShipping: true,
+                            highVolumeSeller: false,
+                            highlightCampaign: true,
+                            quantity: 1
+                        });
+                        return result.netValue;
+                    },
+                    74 // Esperado: 100 - (12 + 2 + 6 + 4 + 2) = 74
+                );
+            }
+
+            testNetValueMode() {
+                console.log('🧪 Testando Modo Valor Líquido...');
+
+                // Teste 1: Quero receber R$ 76 líquido com frete grátis
+                this.runTest(
+                    'Líquido R$ 76,00 com Frete Grátis',
+                    () => {
+                        const result = this.calculator.calculateFromNetValue({
+                            netValue: 76,
+                            freeShipping: true,
+                            highVolumeSeller: false,
+                            highlightCampaign: false,
+                            quantity: 1
+                        });
+                        return Math.round(result.productValue);
+                    },
+                    100 // Deveria resultar em aproximadamente R$ 100
+                );
+
+                // Teste 2: Quero receber R$ 39 líquido sem frete grátis
+                this.runTest(
+                    'Líquido R$ 39,00 sem Frete Grátis',
+                    () => {
+                        const result = this.calculator.calculateFromNetValue({
+                            netValue: 39,
+                            freeShipping: false,
+                            highVolumeSeller: false,
+                            highlightCampaign: false,
+                            quantity: 1
+                        });
+                        return Math.round(result.productValue);
+                    },
+                    50 // Deveria resultar em aproximadamente R$ 50
+                );
+            }
+
+            testSpecialCases() {
+                console.log('🧪 Testando Casos Especiais...');
+
+                // Teste 1: Múltiplos itens
+                this.runTest(
+                    'Especial: 3 itens de R$ 100,00',
+                    () => {
+                        const result = this.calculator.calculateFromProductValue({
+                            productValue: 100,
+                            freeShipping: false,
+                            highVolumeSeller: false,
+                            highlightCampaign: false,
+                            quantity: 3
+                        });
+                        return result.fees.itemFee;
+                    },
+                    12 // Esperado: 4 * 3 = 12
+                );
+
+                // Teste 2: Produto de R$ 3,00 (taxa especial)
+                this.runTest(
+                    'Especial: Produto R$ 3,00 (taxa especial)',
+                    () => {
+                        const result = this.calculator.calculateFromProductValue({
+                            productValue: 3,
+                            freeShipping: false,
+                            highVolumeSeller: false,
+                            highlightCampaign: false,
+                            quantity: 1
+                        });
+                        return result.fees.itemFee;
+                    },
+                    1.5 // Esperado: 3 / 2 = 1.5
+                );
+
+                // Teste 3: Verificar se o limite de R$ 100 é aplicado
+                this.runTest(
+                    'Especial: Limite de R$ 100 aplicado',
+                    () => {
+                        const result = this.calculator.calculateFromProductValue({
+                            productValue: 1000,
+                            freeShipping: true,
+                            highVolumeSeller: false,
+                            highlightCampaign: true,
+                            quantity: 1
+                        });
+                        return result.fees.limited;
+                    },
+                    true // Esperado: true (limite aplicado)
+                );
+            }
+
+            testValidations() {
+                console.log('🧪 Testando Validações...');
+
+                // Teste 1: Valor zero
+                this.runTest(
+                    'Validação: Valor zero',
+                    () => {
+                        return this.calculator.validateInput({
+                            productValue: 0,
+                            netValue: 0,
+                            quantity: 1
+                        });
+                    },
+                    false // Esperado: false (inválido)
+                );
+
+                // Teste 2: Quantidade zero
+                this.runTest(
+                    'Validação: Quantidade zero',
+                    () => {
+                        return this.calculator.validateInput({
+                            productValue: 100,
+                            netValue: 0,
+                            quantity: 0
+                        });
+                    },
+                    false // Esperado: false (inválido)
+                );
+
+                // Teste 3: Valores válidos
+                this.runTest(
+                    'Validação: Valores válidos',
+                    () => {
+                        return this.calculator.validateInput({
+                            productValue: 100,
+                            netValue: 0,
+                            quantity: 1
+                        });
+                    },
+                    true // Esperado: true (válido)
+                );
+            }
+
+            runAllTests() {
+                console.log('🚀 Iniciando todos os testes...');
+                this.results = [];
+
+                this.testProductValueMode();
+                this.testNetValueMode();
+                this.testSpecialCases();
+                this.testValidations();
+
+                this.displayResults();
+                console.log('✅ Testes concluídos!');
+            }
+        }
+
+        // Funções globais
+        function runAllTests() {
+            const tester = new CalculatorTests();
+            tester.runAllTests();
+        }
+
+        function clearResults() {
+            document.getElementById('test-results').innerHTML = '';
+        }
+
+        // Executar testes automaticamente quando a página carregar
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 Página de testes carregada. Use runAllTests() para executar os testes.');
+        });
+    </script>
+</body>
+</html>

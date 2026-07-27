@@ -1,140 +1,99 @@
-# Calculadora de Taxas Shopee
+# Shopee Fee Calculator
 
-Uma calculadora completa para calcular comissões e taxas da Shopee, permitindo aos vendedores entenderem exatamente quanto receberão líquido e qual valor devem anunciar para atingir um valor líquido desejado.
+A small client-side calculator for estimating Shopee selling fees and the amount left from a sale. It can also work backwards from a desired net amount and estimate the product price needed to reach it.
 
-## 🚀 Funcionalidades
+The user interface is in Brazilian Portuguese and formats values as Brazilian reais (`BRL`). This project is not an official Shopee tool and does not connect to Shopee services.
 
-### Modos de Cálculo
-- **Modo Valor do Produto**: Insira o valor do produto e veja quanto receberá líquido
-- **Modo Valor Líquido Desejado**: Insira quanto quer receber e veja qual valor anunciar
+## Product Overview
 
-### Taxas Implementadas
-- ✅ **Comissão Padrão**: 12% sobre o valor do produto
-- ✅ **Taxa de Transação**: 2% sobre o valor do produto
-- ✅ **Taxa de Transporte**: 6% sobre o valor do produto (Programa de Frete Grátis)
-- ✅ **Taxa por Item Vendido**: R$ 4,00 ou R$ 5,00 (vendedores CPF com +450 pedidos)
-- ✅ **Campanhas de Destaque**: +2% sobre o valor do produto
-- ✅ **Limite de Comissão**: Máximo R$ 100,00 por item
-- ✅ **Produtos abaixo de R$ 8,00**: Taxa por item = metade do valor do produto
+The calculator runs entirely in the browser. Enter a product price or a desired net amount, select the applicable options, and submit the form. Results include the product value, each applicable fee, total fees, net value, profit margin, and total fee percentage.
 
-### Interface
-- 🎨 Design moderno e responsivo
-- 📱 Compatível com dispositivos móveis
-- 🔄 Cálculos em tempo real
-- 📊 Visualização detalhada das taxas
-- ⚠️ Alertas e validações
+## Supported Calculations and Options
 
-## 🛠️ Como Usar
+### Calculation modes
 
-### 1. Modo Valor do Produto
-1. Selecione "Valor do Produto"
-2. Insira o valor que pretende anunciar
-3. Configure as opções (Frete Grátis, Campanhas, etc.)
-4. Veja o valor líquido que receberá
+- **Product value:** starts with the selling price and calculates the estimated fees and net value.
+- **Desired net value:** starts with the amount to receive and estimates the selling price required. This mode uses an iterative calculation and is an approximation.
 
-### 2. Modo Valor Líquido Desejado
-1. Selecione "Valor Líquido Desejado"
-2. Insira quanto quer receber líquido
-3. Configure as opções
-4. Veja qual valor deve anunciar
+### Fee rules implemented in the current JavaScript
 
-### 3. Configurações Disponíveis
-- **Programa de Frete Grátis**: Adiciona 6% de taxa de transporte
-- **Vendedor CPF com +450 pedidos**: Taxa por item de R$ 5,00 (ao invés de R$ 4,00)
-- **Campanha de Destaque**: Adiciona 2% de taxa extra
-- **Quantidade**: Para calcular múltiplos itens
+- Standard commission: `12%` of the product value.
+- Transaction fee: `2%` of the product value.
+- Free Shipping Program: optional `6%` of the product value.
+- Highlight Campaign: optional additional `2%` of the product value.
+- Item fee for products priced at `R$ 8.00` or more: `R$ 4.00` per item, or `R$ 5.00` when the CPF seller option is selected.
+- CPF seller option: labeled in the UI as a seller with more than 450 orders in 90 days; it changes the item fee from `R$ 4.00` to `R$ 5.00` for products priced at or above `R$ 8.00`.
+- Products priced below `R$ 8.00`: the item fee is half of the product value instead of the fixed item fee.
+- Quantity: multiplies the item fee and the total fee limit.
+- Fee limit: total calculated fees are capped at `R$ 100.00` per item, so the cap is `R$ 100.00 x quantity` for the entered quantity.
 
-## 📋 Exemplos de Cálculo
+The fee percentages and fixed amounts are hard-coded assumptions in `script.js`. The calculator displays the individual fee components, while the cap is applied to the total used for the net-value calculation.
 
-### Exemplo 1: Produto R$ 100,00 com Frete Grátis
-- **Valor do Produto**: R$ 100,00
-- **Comissão Padrão (12%)**: R$ 12,00
-- **Taxa de Transação (2%)**: R$ 2,00
-- **Taxa de Transporte (6%)**: R$ 6,00
-- **Taxa por Item**: R$ 4,00
-- **Total de Comissões**: R$ 24,00
-- **Valor Líquido**: R$ 76,00
+## Local Usage
 
-### Exemplo 2: Produto R$ 50,00 sem Frete Grátis
-- **Valor do Produto**: R$ 50,00
-- **Comissão Padrão (12%)**: R$ 6,00
-- **Taxa de Transação (2%)**: R$ 1,00
-- **Taxa por Item**: R$ 4,00
-- **Total de Comissões**: R$ 11,00
-- **Valor Líquido**: R$ 39,00
+No build tool or package installation is required. A local HTTP server is recommended so the pages behave like a normally hosted static site.
 
-### Exemplo 3: Produto R$ 5,00 (abaixo de R$ 8,00)
-- **Valor do Produto**: R$ 5,00
-- **Comissão Padrão (12%)**: R$ 0,60
-- **Taxa de Transação (2%)**: R$ 0,10
-- **Taxa por Item (metade do valor)**: R$ 2,50
-- **Total de Comissões**: R$ 3,20
-- **Valor Líquido**: R$ 1,80
+```bash
+git clone https://github.com/xfelipealves/shopee-calculator-taxes.git
+cd shopee-calculator-taxes
+python3 -m http.server 8000
+```
 
-## 🔧 Tecnologias Utilizadas
+Open [http://localhost:8000/](http://localhost:8000/) in a browser. To stop the server, press `Ctrl+C` in the terminal.
 
-- **HTML5**: Estrutura semântica
-- **CSS3**: Estilização moderna com Flexbox e Grid
-- **JavaScript ES6+**: Lógica de cálculo e interatividade
-- **Font Awesome**: Ícones
-- **Design Responsivo**: Compatível com todos os dispositivos
+You can also open `index.html` directly, although the page loads Font Awesome from a CDN, so its icons require network access.
 
-## 📱 Responsividade
+## Project Structure
 
-A calculadora é totalmente responsiva e funciona perfeitamente em:
-- 💻 Desktops e laptops
-- 📱 Smartphones
-- 📟 Tablets
+```text
+.
+├── index.html   # Main calculator page
+├── script.js    # Calculator logic and browser interactions
+├── style.css    # Layout, visual styles, and responsive rules
+├── test.html    # Intended browser-based test harness
+└── README.md    # Project documentation
+```
 
-## 🚀 Como Executar
+There is currently no package manager configuration, build pipeline, or server-side component in the repository.
 
-1. Clone ou baixe os arquivos
-2. Abra o arquivo `index.html` em qualquer navegador moderno
-3. Comece a calcular!
+## Browser Support
 
-## 📊 Recursos Avançados
+The application targets current browsers with support for standard ES6 JavaScript, the DOM, `Intl.NumberFormat`, CSS Grid, CSS Flexbox, and `input type="number"`. The stylesheet includes responsive layouts for smaller screens, including breakpoints at 768px and 480px.
 
-### Cálculo Iterativo
-Para o modo "Valor Líquido Desejado", a calculadora usa um algoritmo iterativo para encontrar o valor exato a ser anunciado, considerando que as taxas dependem do valor do produto.
+The project is intended for current versions of Chrome, Edge, Firefox, and Safari. Older browsers may not support all of the JavaScript or CSS features used by the application.
 
-### Validações
-- ✅ Valores numéricos válidos
-- ✅ Quantidade positiva
-- ✅ Mensagens de erro claras
-- ✅ Prevenção de valores inválidos
+## Limitations and Estimates
 
-### Performance
-- ⚡ Cálculos em tempo real
-- 🔄 Atualizações automáticas
-- 💾 Sem necessidade de servidor
+- Shopee fee rules, eligibility criteria, rates, thresholds, and limits may change. The values in this calculator are estimates based on the assumptions currently hard-coded in `script.js` and should be reviewed before use.
+- Results are not an official quote, payout statement, tax calculation, or accounting advice.
+- The application does not fetch current Shopee rates, seller account settings, order data, shipping data, or campaign terms from an API.
+- The desired-net-value mode iterates up to five times and stops when it is within approximately one cent, so results near fee thresholds or the `R$ 100.00` cap can differ from the intended target.
+- The calculator does not save calculation history, export reports, compare scenarios, or persist data between page loads.
+- The UI accepts a quantity input, but the current JavaScript parses it as an integer. Use whole, positive item counts.
+- `test.html` is a browser-based harness intended to cover product-value calculations, desired-net-value calculations, special cases, and validations. As currently written, it cannot run independently because `script.js` initializes the main calculator on every page and expects form elements that are absent from `test.html`. This integration issue must be fixed before treating the harness as a reliable test suite.
 
-## 🎯 Casos de Uso
+## Validation and Testing
 
-1. **Vendedores iniciantes**: Entender quanto receberão de cada venda
-2. **Vendedores experientes**: Otimizar preços para margens específicas
-3. **Análise de campanhas**: Calcular impacto de campanhas promocionais
-4. **Planejamento financeiro**: Prever receitas líquidas
+For a lightweight static check, run:
 
-## 📈 Próximas Funcionalidades
+```bash
+node --check script.js
+git diff --check
+```
 
-- [ ] Histórico de cálculos
-- [ ] Exportação de relatórios
-- [ ] Comparação de cenários
-- [ ] Integração com APIs da Shopee
-- [ ] Calculadora para outros marketplaces
+For manual validation, open `index.html`, try both calculation modes, toggle each option individually and in combination, test a product below `R$ 8.00`, test multiple items, and verify the fee cap with a high product value. Confirm that invalid or non-positive product and net-value inputs, and zero or negative quantity inputs, show an error.
 
-## 🤝 Contribuição
+The repository does not currently include an automated test runner. The cases embedded in `test.html` document expected scenarios, but the harness limitation described above means they are not currently a passing automated or standalone browser test suite.
 
-Contribuições são bem-vindas! Sinta-se à vontade para:
-- Reportar bugs
-- Sugerir melhorias
-- Adicionar novas funcionalidades
-- Melhorar a documentação
+## Contributing
 
-## 📄 Licença
+Contributions are welcome. Before opening a pull request:
 
-Este projeto é de código aberto e está disponível sob a licença MIT.
+1. Keep the calculator behavior and documentation aligned with the actual source code.
+2. Avoid presenting Shopee fee assumptions as guaranteed or current without verification.
+3. Exercise the main page manually and run the lightweight static checks above.
+4. Describe behavior changes and any changed fee assumptions in the pull request.
 
----
+## License Status
 
-**Desenvolvido com ❤️ para a comunidade de vendedores da Shopee**
+This repository does not contain a `LICENSE` file. No specific open-source license is stated in the current repository; do not assume that the project is available under the MIT license.

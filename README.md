@@ -1,5 +1,9 @@
 # Pricing in Perspective
 
+![Generated conceptual pricing calculator cover](docs/images/readme-cover.png)
+
+Conceptual cover generated with OpenAI’s built-in imagegen tool; an illustration, not an application screenshot. [Prompt brief and provenance](docs/images/README.md).
+
 A React + TypeScript pricing simulator for exploring selling prices, costs, fees and profit in Brazilian reais. Start with a unit price or a desired batch profit, edit the assumptions and compare up to four scenarios. The interface remains in Brazilian Portuguese.
 
 **The preset is an illustrative scenario, not verified current Shopee rates.** This independent portfolio project has no marketplace connection and provides no official quote, tax calculation or fiscal advice.
@@ -98,7 +102,7 @@ test.html                  Historical harness
 
 The automated suite covers rounding, net revenue versus profit, quantity, caps, zero values, loss, minimal inverse prices, parsing and input limits. Production typecheck/build and a local Orca browser flow were also exercised. Browser inputs updated correctly; button actions were verified through DOM activation because Orca's typed click/key commands did not activate them in the tested tab. This does not establish physical pointer/keyboard usability, physical mobile-device behavior or screen-reader compatibility. Desktop and narrow-screen viewport captures were visually reviewed; pointer/keyboard and assistive-technology reviews remain open.
 
-This app omits seller-paid shipping, taxes, advertising, returns and operating expenses. Real platforms may use different bases and rounding rules. It has no backend, persistence, export or current-rate lookup. Actual desktop and narrow-screen screenshots are included. No public deployment or generated artwork is included; the coordinator's illustrative README cover and an optional demo recording remain follow-up work.
+This app omits seller-paid shipping, taxes, advertising, returns and operating expenses. Real platforms may use different bases and rounding rules. It has no backend, persistence, export or current-rate lookup. Actual desktop and narrow-screen screenshots are included. A clearly labeled generated conceptual cover is also included. No public deployment is included; an optional genuine demo recording remains follow-up work.
 
 ## Contributing
 

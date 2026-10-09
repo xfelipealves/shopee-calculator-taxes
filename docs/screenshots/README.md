@@ -10,4 +10,4 @@ The narrow captures use a desktop browser resized to mobile-width CSS dimensions
 
 The Orca iPhone 12 emulation and full-page capture attempts produced repeated image tiles; those defective captures were excluded. Viewport screenshots at scale factor 1 were visually inspected and retained without editing. Button behavior was checked using DOM activation through Orca because typed click/key activation did not fire in the tested embedded tab; screenshots do not establish native input-event or assistive-technology compatibility.
 
-Remaining presentation work: the coordinator's clearly labeled illustrative README cover and, optionally, a genuine short comparison/inverse-pricing recording. Full-page/mobile-device, pointer/keyboard and screen-reader reviews remain separate follow-up checks.
+The coordinator's clearly labeled [conceptual cover](../images/README.md) is separate from these captures. Remaining presentation work: optionally, a genuine short comparison/inverse-pricing recording. Full-page/mobile-device, pointer/keyboard and screen-reader reviews remain separate follow-up checks.

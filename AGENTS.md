@@ -7,6 +7,7 @@ This is the canonical project instruction file. README and all tracked documenta
 - Work directly in the default checkout on the actual remote default branch (currently `master`). Do not create branches or worktrees for portfolio maintenance.
 - Preserve dirty work and all existing assets. If an existing sibling worktree contains an uncommitted delivery, commit it there in a coherent preservation commit solely for integration, then do subsequent work in the default checkout.
 - Integrate preexisting feature branches only after checking their changes and proving they are preserved on the default branch. Detach a clean sibling at its preserved commit before deleting its merged branch; retain the worktree, ignored assets and running demo.
+- When the user explicitly requests cleanup, preserve committed code and any ignored local data first, then let the coordinator remove completed non-main worktrees headlessly after accepting worker settlement. Remove Orca project registration only afterward, keeping the default repository and GitHub code intact. Never remove the active worker’s project registration mid-dispatch.
 - Delete safely merged local/remote branches normally only after preservation evidence is available. Never use a forced deletion to bypass ancestry checks.
 - Never overwrite dirty work, use `reset --hard`, force-push, rewrite published history, kill unrelated processes or touch business repositories.
 - Keep changes focused on the requested portfolio delivery. Do not introduce unsolicited redesigns, framework migrations or new product scope.

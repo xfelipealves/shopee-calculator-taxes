@@ -18,7 +18,7 @@ The initial upgrade was prepared in the existing `portfolio-pricing-calculator` 
 2. Provide a pure calculation engine with integer cents, basis points, explicit limits, batch quantity, costs and fees per unit, and inverse pricing for profit after costs.
 3. Provide a React + TypeScript + Vite interface with two modes, reconciled financial breakdown, editable rates/cap, up to four immutable scenario snapshots, removal and a fictional example.
 4. Integrate into the default checkout, add meaningful calculation tests, translate documentation and register canonical portfolio preferences in AGENTS.md.
-5. Verify the production build and the local application flow; push normally and inspect existing CI without deploying publicly.
+5. Verify the production build and the local application flow; push normally and verify CI without deploying publicly.
 
 ## Design decisions retained
 
@@ -41,6 +41,8 @@ The workbench places editing on the left, results on the right and comparison be
 - Local Orca browser checks exercised input updates, profit inversion, snapshots, comparison capacity, removal, zero values, errors, loss, cap changes, quantity and reload behavior. Buttons required Orca DOM activation because typed click/key commands did not activate them in the tested embedded tab. Actual desktop (1361 × 948) and narrow-screen (390 × 844) viewport captures were reviewed. The narrow viewport had document width 390 with no page-level horizontal overflow. Physical pointer/keyboard, real mobile-device and screen-reader testing remain open.
 
 The October 8 preparation did not add or execute tests because that earlier task excluded them; the October 9 integration explicitly authorized tests and replaces that limitation. Earlier preparation checks included build/typecheck, original JavaScript syntax and static reviews; those historical observations are not evidence of current marketplace rates.
+
+A coordinator follow-up authorized a minimal Node 22 GitHub Actions workflow after confirming there were no existing workflows or commit checks. The workflow runs locked installation, the behavioral suite, typecheck/build and a runtime dependency audit on pushes, pull requests and manual dispatch; it does not deploy.
 
 ## Fictional demonstration
 

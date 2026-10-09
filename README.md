@@ -34,6 +34,10 @@ npm run preview
 
 Full demo steps and the delivery history are in [the portfolio plan](docs/PORTFOLIO-PLAN.md).
 
+## Continuous integration
+
+[Pricing calculator CI](.github/workflows/ci.yml) runs on pushes to `master`, pull requests and manual dispatch. It uses Node 22 to install locked dependencies, run the behavioral tests, typecheck/build, and audit runtime dependencies with `npm audit --omit=dev`. Actions are pinned to commits and the job has read-only repository permissions. Local RTK wrappers are not required on the hosted runner.
+
 ## Actual interface screenshots
 
 ![Desktop pricing simulator with the fictional example](docs/screenshots/desktop.png)

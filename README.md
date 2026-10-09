@@ -1,99 +1,93 @@
-# Shopee Fee Calculator
+# Preço em perspectiva
 
-A small client-side calculator for estimating Shopee selling fees and the amount left from a sale. It can also work backwards from a desired net amount and estimate the product price needed to reach it.
+Simulador local de precificação em React + TypeScript. Informe preço por unidade ou lucro líquido desejado para o lote, configure custos/taxas e compare até quatro cenários. Interface em português, valores em reais e dados fictícios.
 
-The user interface is in Brazilian Portuguese and formats values as Brazilian reais (`BRL`). This project is not an official Shopee tool and does not connect to Shopee services.
+**Preset demonstrativo, sem tarifas atuais verificadas da Shopee.** Não há conexão com marketplaces, contas ou serviços externos. O exemplo usa hipóteses históricas editáveis; não é uma cotação de plataforma.
 
-## Product Overview
+## Executar neste checkout
 
-The calculator runs entirely in the browser. Enter a product price or a desired net amount, select the applicable options, and submit the form. Results include the product value, each applicable fee, total fees, net value, profit margin, and total fee percentage.
-
-## Supported Calculations and Options
-
-### Calculation modes
-
-- **Product value:** starts with the selling price and calculates the estimated fees and net value.
-- **Desired net value:** starts with the amount to receive and estimates the selling price required. This mode uses an iterative calculation and is an approximation.
-
-### Fee rules implemented in the current JavaScript
-
-- Standard commission: `12%` of the product value.
-- Transaction fee: `2%` of the product value.
-- Free Shipping Program: optional `6%` of the product value.
-- Highlight Campaign: optional additional `2%` of the product value.
-- Item fee for products priced at `R$ 8.00` or more: `R$ 4.00` per item, or `R$ 5.00` when the CPF seller option is selected.
-- CPF seller option: labeled in the UI as a seller with more than 450 orders in 90 days; it changes the item fee from `R$ 4.00` to `R$ 5.00` for products priced at or above `R$ 8.00`.
-- Products priced below `R$ 8.00`: the item fee is half of the product value instead of the fixed item fee.
-- Quantity: multiplies the item fee and the total fee limit.
-- Fee limit: total calculated fees are capped at `R$ 100.00` per item, so the cap is `R$ 100.00 x quantity` for the entered quantity.
-
-The fee percentages and fixed amounts are hard-coded assumptions in `script.js`. The calculator displays the individual fee components, while the cap is applied to the total used for the net-value calculation.
-
-## Local Usage
-
-No build tool or package installation is required. A local HTTP server is recommended so the pages behave like a normally hosted static site.
+Requer Node.js 20.19+ ou 22.12+ e npm compatível. Use a versão LTS disponível que satisfaça esses requisitos.
 
 ```bash
-git clone https://github.com/xfelipealves/shopee-calculator-taxes.git
-cd shopee-calculator-taxes
-python3 -m http.server 8000
+rtk npm ci
+rtk npm run dev
 ```
 
-Open [http://localhost:8000/](http://localhost:8000/) in a browser. To stop the server, press `Ctrl+C` in the terminal.
+Abra o endereço local informado pelo Vite (normalmente http://127.0.0.1:5173/). O servidor escuta somente no loopback. Ctrl+C encerra o processo. Nenhuma tela do Orca precisa ser ativada pelo worker.
 
-You can also open `index.html` directly, although the page loads Font Awesome from a CDN, so its icons require network access.
+```bash
+rtk npm run typecheck
+rtk npm run build
+rtk npm run preview
+```
 
-## Project Structure
+O build gera `dist/`; preview serve esse build localmente, geralmente em http://127.0.0.1:4173/. Não é deploy. Este checkout usa o prefixo RTK conforme as instruções da sessão. Nenhum comando de teste foi adicionado.
+
+## Como usar e demonstrar
+
+- **Tenho um preço:** preço, custo e embalagem são por unidade; quantidade multiplica receita, custos e taxas.
+- **Quero um lucro:** a meta é o lucro total do lote, após taxas e custos. O motor encontra o menor preço unitário em centavos que atinge a meta; o arredondamento pode ultrapassá-la.
+- Configure comissão, transação e adicional percentuais; taxa fixa por unidade; teto opcional sobre o conjunto das taxas por unidade.
+- Salve uma alternativa, mude os valores e salve outra. Os snapshots não mudam ao editar o formulário. Até quatro cenários; remoção disponível. Recarregar a página apaga os cenários.
+- “Carregar exemplo fictício” restaura os inputs, modo e teto, mantendo a comparação.
+
+Exemplo fictício inicial: produto R$ 32,00 + embalagem R$ 2,50, uma unidade vendida a R$ 79,90, percentuais de 12% + 2% + 6%, taxa fixa de R$ 4,00 e teto de R$ 100,00. Taxas: R$ 19,98; receita líquida: R$ 59,92; lucro: R$ 25,42. A R$ 69,90, lucro: R$ 17,42. Para meta de lucro R$ 25,00 com uma unidade, preço: R$ 79,37. Roteiro completo em [docs/PORTFOLIO-PLAN.md](docs/PORTFOLIO-PLAN.md).
+
+## Modelo financeiro
 
 ```text
-.
-├── index.html   # Main calculator page
-├── script.js    # Calculator logic and browser interactions
-├── style.css    # Layout, visual styles, and responsive rules
-├── test.html    # Intended browser-based test harness
-└── README.md    # Project documentation
+receita bruta = preço unitário × quantidade
+taxa percentual unitária = arredondar(preço em centavos × soma das taxas / 10.000)
+taxas unitárias = mínimo(taxa percentual + fixa, teto), quando habilitado
+receita líquida = receita bruta − taxas totais
+lucro líquido estimado = receita líquida − custos dos produtos − embalagens
+margem = lucro / receita bruta × 100
 ```
 
-There is currently no package manager configuration, build pipeline, or server-side component in the repository.
+O motor usa centavos inteiros e pontos-base (100 pontos-base = 1%). Arredonda a soma percentual uma vez por unidade e depois multiplica pela quantidade. A redução pelo teto aparece separadamente, permitindo reconciliar o detalhamento. Receita líquida é o valor após taxas **antes dos custos**, não lucro.
 
-## Browser Support
+Entradas aceitam vírgula ou ponto, até duas casas decimais, sem separador de milhares. Custos podem ser zero; preço mínimo R$ 0,01. Limites: R$ 1 milhão por campo monetário, quantidade inteira de 1 a 10.000, soma percentual menor que 100%. Meta de lucro é não negativa e total do lote. Entradas vazias/inválidas mostram erro e impedem salvar cenário. Prejuízo é exibido quando preço não cobre taxas e custos.
 
-The application targets current browsers with support for standard ES6 JavaScript, the DOM, `Intl.NumberFormat`, CSS Grid, CSS Flexbox, and `input type="number"`. The stylesheet includes responsive layouts for smaller screens, including breakpoints at 768px and 480px.
+## Histórico preservado
 
-The project is intended for current versions of Chrome, Edge, Firefox, and Safari. Older browsers may not support all of the JavaScript or CSS features used by the application.
+A calculadora original está em [legacy.html](legacy.html), com aviso visível. `script.js` e `style.css` permanecem intactos. No servidor de desenvolvimento, visite /legacy.html. A página histórica depende de ícones do CDN; o novo simulador não depende de fontes ou ícones externos. O build Vite contém apenas a aplicação nova; o legado é arquivo de referência do checkout, não um produto publicado.
 
-## Limitations and Estimates
+Comportamentos úteis mantidos na versão nova: cálculo direto e inverso, atualização imediata, BRL, decomposição e limite opcional de taxas. Mudanças intencionais:
 
-- Shopee fee rules, eligibility criteria, rates, thresholds, and limits may change. The values in this calculator are estimates based on the assumptions currently hard-coded in `script.js` and should be reviewed before use.
-- Results are not an official quote, payout statement, tax calculation, or accounting advice.
-- The application does not fetch current Shopee rates, seller account settings, order data, shipping data, or campaign terms from an API.
-- The desired-net-value mode iterates up to five times and stops when it is within approximately one cent, so results near fee thresholds or the `R$ 100.00` cap can differ from the intended target.
-- The calculator does not save calculation history, export reports, compare scenarios, or persist data between page loads.
-- The UI accepts a quantity input, but the current JavaScript parses it as an integer. Use whole, positive item counts.
-- `test.html` is a browser-based harness intended to cover product-value calculations, desired-net-value calculations, special cases, and validations. As currently written, it cannot run independently because `script.js` initializes the main calculator on every page and expects form elements that are absent from `test.html`. This integration issue must be fixed before treating the harness as a reliable test suite.
+- Quantidade agora representa unidades idênticas: multiplica também receita e percentuais. No legado, apenas taxa fixa e teto eram multiplicados.
+- Custo do produto e embalagem entram no lucro. A antiga “margem de lucro” media valor após taxas sobre preço, sem custos.
+- A inversão da nova interface busca lucro após custos, em vez de somente receita líquida; usa busca binária em centavos em vez de até cinco iterações.
+- As hipóteses de metade do preço abaixo de R$ 8 e taxa CPF de R$ 5 ficam documentadas e preservadas somente no legado. No novo simulador, a taxa fixa é sempre o parâmetro editado.
+- O adicional histórico opcional de campanha (2%) pode ser simulado editando “Adicional”; não existe alegação de elegibilidade ou regra atual.
+- O legado exibia taxas individuais antes do teto sem reconciliar o detalhamento; a nova tela mostra a redução do teto.
 
-## Validation and Testing
+`test.html` é o harness histórico, sem manutenção nesta tarefa. Ele depende de elementos de formulário ausentes e não deve ser considerado suíte confiável. Nenhum teste foi adicionado ou executado.
 
-For a lightweight static check, run:
+## Estrutura
 
-```bash
-node --check script.js
-git diff --check
+```text
+src/calculator.ts        Motor puro, parsing, limites e formatação
+src/App.tsx             Interface, inputs e snapshots de cenários
+src/styles.css          Acabamento e responsividade
+src/main.tsx            Entrada React
+index.html              Entrada Vite
+package.json            Dependências e comandos locais
+package-lock.json       Versões resolvidas
+tsconfig.json           TypeScript estrito
+docs/PORTFOLIO-PLAN.md   Objetivo, etapas, critérios, demo e verificações
+legacy.html             Interface histórica com aviso
+script.js / style.css   Código original preservado
+test.html               Harness histórico não executado
 ```
 
-For manual validation, open `index.html`, try both calculation modes, toggle each option individually and in combination, test a product below `R$ 8.00`, test multiple items, and verify the fee cap with a high product value. Confirm that invalid or non-positive product and net-value inputs, and zero or negative quantity inputs, show an error.
+## Verificações e limites
 
-The repository does not currently include an automated test runner. The cases embedded in `test.html` document expected scenarios, but the harness limitation described above means they are not currently a passing automated or standalone browser test suite.
+Revisão estática pelo agente principal e worker headless, checks de sintaxe/typecheck/build e whitespace. Resultados e limitações estão no plano de portfólio. Build não comprova interação, layout, navegação por teclado ou precisão das regras de uma plataforma real; revisão visual/interativa fica pendente. Esta tarefa expressamente exclui criação e execução de testes.
 
-## Contributing
+Frete efetivamente pago pelo vendedor, tributos, publicidade, devoluções e despesas operacionais não são descontados. O resultado é estimativa dos parâmetros informados. Plataformas podem arredondar individualmente taxas ou usar outra base. Sem persistência, exportação, backend ou taxas oficiais atuais.
 
-Contributions are welcome. Before opening a pull request:
+Publicação pública, GIF e eventual integração ficam planejados para revisão posterior. Nenhum push, merge ou deploy foi autorizado nesta entrega. Nenhuma alteração de perfil GitHub ou Obsidian.
 
-1. Keep the calculator behavior and documentation aligned with the actual source code.
-2. Avoid presenting Shopee fee assumptions as guaranteed or current without verification.
-3. Exercise the main page manually and run the lightweight static checks above.
-4. Describe behavior changes and any changed fee assumptions in the pull request.
+## Licença
 
-## License Status
-
-This repository does not contain a `LICENSE` file. No specific open-source license is stated in the current repository; do not assume that the project is available under the MIT license.
+O repositório não contém LICENSE. Não presuma licença MIT ou permissão de redistribuição.

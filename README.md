@@ -1,93 +1,105 @@
-# Preço em perspectiva
+# Pricing in Perspective
 
-Simulador local de precificação em React + TypeScript. Informe preço por unidade ou lucro líquido desejado para o lote, configure custos/taxas e compare até quatro cenários. Interface em português, valores em reais e dados fictícios.
+A React + TypeScript pricing simulator for exploring selling prices, costs, fees and profit in Brazilian reais. Start with a unit price or a desired batch profit, edit the assumptions and compare up to four scenarios. The interface remains in Brazilian Portuguese.
 
-**Preset demonstrativo, sem tarifas atuais verificadas da Shopee.** Não há conexão com marketplaces, contas ou serviços externos. O exemplo usa hipóteses históricas editáveis; não é uma cotação de plataforma.
+**The preset is an illustrative scenario, not verified current Shopee rates.** This independent portfolio project has no marketplace connection and provides no official quote, tax calculation or fiscal advice.
 
-## Executar neste checkout
+## Run locally
 
-Requer Node.js 20.19+ ou 22.12+ e npm compatível. Use a versão LTS disponível que satisfaça esses requisitos.
-
-```bash
-rtk npm ci
-rtk npm run dev
-```
-
-Abra o endereço local informado pelo Vite (normalmente http://127.0.0.1:5173/). O servidor escuta somente no loopback. Ctrl+C encerra o processo. Nenhuma tela do Orca precisa ser ativada pelo worker.
+Requires Node.js 20.19+ or 22.12+ and npm. From the repository root:
 
 ```bash
-rtk npm run typecheck
-rtk npm run build
-rtk npm run preview
+npm ci
+npm run dev
 ```
 
-O build gera `dist/`; preview serve esse build localmente, geralmente em http://127.0.0.1:4173/. Não é deploy. Este checkout usa o prefixo RTK conforme as instruções da sessão. Nenhum comando de teste foi adicionado.
+Open the loopback URL printed by Vite, usually http://127.0.0.1:5173/. Stop your own server with Ctrl+C. If another demo already owns that port, preserve it and use `npm run dev -- --port 5174 --strictPort` with an available port.
 
-## Como usar e demonstrar
+```bash
+npm test
+npm run typecheck
+npm run build
+npm run preview
+```
 
-- **Tenho um preço:** preço, custo e embalagem são por unidade; quantidade multiplica receita, custos e taxas.
-- **Quero um lucro:** a meta é o lucro total do lote, após taxas e custos. O motor encontra o menor preço unitário em centavos que atinge a meta; o arredondamento pode ultrapassá-la.
-- Configure comissão, transação e adicional percentuais; taxa fixa por unidade; teto opcional sobre o conjunto das taxas por unidade.
-- Salve uma alternativa, mude os valores e salve outra. Os snapshots não mudam ao editar o formulário. Até quatro cenários; remoção disponível. Recarregar a página apaga os cenários.
-- “Carregar exemplo fictício” restaura os inputs, modo e teto, mantendo a comparação.
+`npm test` compiles the pure calculation engine into ignored `.test-build/` and runs Node's built-in test runner. `build` typechecks and produces `dist/`; `preview` serves that production build locally, normally on port 4173. Neither command deploys the app. Agents in this workspace prefix shell commands with `rtk` (use `rtk proxy` when raw output is needed).
 
-Exemplo fictício inicial: produto R$ 32,00 + embalagem R$ 2,50, uma unidade vendida a R$ 79,90, percentuais de 12% + 2% + 6%, taxa fixa de R$ 4,00 e teto de R$ 100,00. Taxas: R$ 19,98; receita líquida: R$ 59,92; lucro: R$ 25,42. A R$ 69,90, lucro: R$ 17,42. Para meta de lucro R$ 25,00 com uma unidade, preço: R$ 79,37. Roteiro completo em [docs/PORTFOLIO-PLAN.md](docs/PORTFOLIO-PLAN.md).
+## Try the calculator
 
-## Modelo financeiro
+1. Load the fictional example: unit cost R$32.00, packaging R$2.50, price R$79.90, one unit, combined fees 20%, fixed fee R$4.00 and fee cap R$100.00. Fees are R$19.98, net revenue R$59.92 and profit R$25.42.
+2. Save a scenario using **Salvar cenário**. Change the price to R$69.90 and save another: profit becomes R$17.42, while the first snapshot stays unchanged.
+3. Choose **Quero um lucro** and set a R$25.00 batch profit target. The minimum unit price is R$79.37 under these assumptions.
+4. Change quantity, costs, rates or the optional cap. Compare batch totals carefully; only the price column is per unit.
+5. Remove a scenario to free capacity. Loading the example preserves saved scenarios; reloading the page clears them.
+
+Full demo steps and the delivery history are in [the portfolio plan](docs/PORTFOLIO-PLAN.md).
+
+## Actual interface screenshots
+
+![Desktop pricing simulator with the fictional example](docs/screenshots/desktop.png)
+
+Actual production-preview capture at 1361 × 948 CSS pixels. The example yields R$25.42 profit after modeled fees and costs.
+
+[Narrow-screen inputs](docs/screenshots/mobile.png) and [narrow-screen results](docs/screenshots/mobile-results.png) show the same app at 390 × 844 CSS pixels. These are real browser viewport captures, not generated illustrations or physical-device test evidence. See [capture details](docs/screenshots/README.md).
+
+## Calculation model
 
 ```text
-receita bruta = preço unitário × quantidade
-taxa percentual unitária = arredondar(preço em centavos × soma das taxas / 10.000)
-taxas unitárias = mínimo(taxa percentual + fixa, teto), quando habilitado
-receita líquida = receita bruta − taxas totais
-lucro líquido estimado = receita líquida − custos dos produtos − embalagens
-margem = lucro / receita bruta × 100
+gross revenue = unit price × quantity
+percentage fee per unit = round(unit price in cents × combined basis points / 10,000)
+fee per unit = percentage fee + fixed fee, limited by the optional cap
+net revenue = gross revenue − total fees
+estimated profit = net revenue − product costs − packaging costs
+margin = profit / gross revenue × 100
 ```
 
-O motor usa centavos inteiros e pontos-base (100 pontos-base = 1%). Arredonda a soma percentual uma vez por unidade e depois multiplica pela quantidade. A redução pelo teto aparece separadamente, permitindo reconciliar o detalhamento. Receita líquida é o valor após taxas **antes dos custos**, não lucro.
+The engine uses integer cents and basis points (100 basis points = 1%). It rounds the combined percentage fee once per unit, then multiplies by quantity. The breakdown shows the cap reduction separately so every total reconciles. **Net revenue is after fees but before costs; it is not profit.** Inverse pricing uses a binary search for the lowest cent-denominated unit price reaching the total batch profit target; rounding can exceed the target.
 
-Entradas aceitam vírgula ou ponto, até duas casas decimais, sem separador de milhares. Custos podem ser zero; preço mínimo R$ 0,01. Limites: R$ 1 milhão por campo monetário, quantidade inteira de 1 a 10.000, soma percentual menor que 100%. Meta de lucro é não negativa e total do lote. Entradas vazias/inválidas mostram erro e impedem salvar cenário. Prejuízo é exibido quando preço não cobre taxas e custos.
+Inputs accept decimal commas or points, up to two decimal places, without thousands separators. Costs, fees and target profit can be zero; unit price must be at least R$0.01. Monetary fields are limited to R$1 million, quantity to integers from 1 to 10,000, and combined percentage fees to less than 100%. Invalid inputs show an error and disable saving. Negative profit is shown as an estimated loss.
 
-## Histórico preservado
+## Preserved history
 
-A calculadora original está em [legacy.html](legacy.html), com aviso visível. `script.js` e `style.css` permanecem intactos. No servidor de desenvolvimento, visite /legacy.html. A página histórica depende de ícones do CDN; o novo simulador não depende de fontes ou ícones externos. O build Vite contém apenas a aplicação nova; o legado é arquivo de referência do checkout, não um produto publicado.
+[legacy.html](legacy.html) preserves the original calculator with a visible archive warning. Its `script.js`, `style.css` and `test.html` are retained. Visit `/legacy.html` on the development server; the legacy page needs a CDN for icons. The production build includes the React app only.
 
-Comportamentos úteis mantidos na versão nova: cálculo direto e inverso, atualização imediata, BRL, decomposição e limite opcional de taxas. Mudanças intencionais:
+Intentional changes from the original:
 
-- Quantidade agora representa unidades idênticas: multiplica também receita e percentuais. No legado, apenas taxa fixa e teto eram multiplicados.
-- Custo do produto e embalagem entram no lucro. A antiga “margem de lucro” media valor após taxas sobre preço, sem custos.
-- A inversão da nova interface busca lucro após custos, em vez de somente receita líquida; usa busca binária em centavos em vez de até cinco iterações.
-- As hipóteses de metade do preço abaixo de R$ 8 e taxa CPF de R$ 5 ficam documentadas e preservadas somente no legado. No novo simulador, a taxa fixa é sempre o parâmetro editado.
-- O adicional histórico opcional de campanha (2%) pode ser simulado editando “Adicional”; não existe alegação de elegibilidade ou regra atual.
-- O legado exibia taxas individuais antes do teto sem reconciliar o detalhamento; a nova tela mostra a redução do teto.
+- Quantity multiplies revenue, percentage fees and costs as well as fixed fees and caps.
+- Profit subtracts product and packaging costs; the legacy margin used only revenue after fees.
+- Inverse pricing targets profit after costs rather than only revenue after fees.
+- The historical below-R$8 half-price item fee and CPF R$5 option remain in the archive; the new fixed fee is always the editable parameter.
+- Historical optional campaign fees can be explored through the editable additional percentage, without implying current eligibility.
+- The new breakdown reconciles the total fee cap through a separate reduction line.
 
-`test.html` é o harness histórico, sem manutenção nesta tarefa. Ele depende de elementos de formulário ausentes e não deve ser considerado suíte confiável. Nenhum teste foi adicionado ou executado.
+The historical `test.html` harness depends on missing main-form elements and is not a reliable standalone test suite. Use `npm test` for the new engine.
 
-## Estrutura
+## Project structure
 
 ```text
-src/calculator.ts        Motor puro, parsing, limites e formatação
-src/App.tsx             Interface, inputs e snapshots de cenários
-src/styles.css          Acabamento e responsividade
-src/main.tsx            Entrada React
-index.html              Entrada Vite
-package.json            Dependências e comandos locais
-package-lock.json       Versões resolvidas
-tsconfig.json           TypeScript estrito
-docs/PORTFOLIO-PLAN.md   Objetivo, etapas, critérios, demo e verificações
-legacy.html             Interface histórica com aviso
-script.js / style.css   Código original preservado
-test.html               Harness histórico não executado
+src/calculator.ts          Pure engine, parsing, validation and BRL formatting
+src/App.tsx                React interface and scenario snapshots
+src/styles.css             Responsive layout and styles
+src/main.tsx               React entry point
+index.html                 Vite entry point
+package.json / lockfile    Local commands and resolved dependencies
+tsconfig.json              Strict TypeScript configuration
+tests/calculator.test.mjs  Calculation behavior tests
+docs/PORTFOLIO-PLAN.md     Product decisions, demo and validation history
+AGENTS.md                  Canonical portfolio workflow instructions
+legacy.html                Archived interface with warning
+script.js / style.css      Original code preserved
+test.html                  Historical harness
 ```
 
-## Verificações e limites
+## Validation and limits
 
-Revisão estática pelo agente principal e worker headless, checks de sintaxe/typecheck/build e whitespace. Resultados e limitações estão no plano de portfólio. Build não comprova interação, layout, navegação por teclado ou precisão das regras de uma plataforma real; revisão visual/interativa fica pendente. Esta tarefa expressamente exclui criação e execução de testes.
+The automated suite covers rounding, net revenue versus profit, quantity, caps, zero values, loss, minimal inverse prices, parsing and input limits. Production typecheck/build and a local Orca browser flow were also exercised. Browser inputs updated correctly; button actions were verified through DOM activation because Orca's typed click/key commands did not activate them in the tested tab. This does not establish physical pointer/keyboard usability, physical mobile-device behavior or screen-reader compatibility. Desktop and narrow-screen viewport captures were visually reviewed; pointer/keyboard and assistive-technology reviews remain open.
 
-Frete efetivamente pago pelo vendedor, tributos, publicidade, devoluções e despesas operacionais não são descontados. O resultado é estimativa dos parâmetros informados. Plataformas podem arredondar individualmente taxas ou usar outra base. Sem persistência, exportação, backend ou taxas oficiais atuais.
+This app omits seller-paid shipping, taxes, advertising, returns and operating expenses. Real platforms may use different bases and rounding rules. It has no backend, persistence, export or current-rate lookup. Actual desktop and narrow-screen screenshots are included. No public deployment or generated artwork is included; the coordinator's illustrative README cover and an optional demo recording remain follow-up work.
 
-Publicação pública, GIF e eventual integração ficam planejados para revisão posterior. Nenhum push, merge ou deploy foi autorizado nesta entrega. Nenhuma alteração de perfil GitHub ou Obsidian.
+## Contributing
 
-## Licença
+Follow [AGENTS.md](AGENTS.md), keep assumptions editable and documentation consistent with the engine, and run the meaningful tests, typecheck and build before delivery. Preserve legacy assets and existing demos.
 
-O repositório não contém LICENSE. Não presuma licença MIT ou permissão de redistribuição.
+## License
+
+The repository has no LICENSE file. Do not assume an MIT license or permission to redistribute.

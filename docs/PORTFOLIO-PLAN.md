@@ -1,78 +1,62 @@
-# Preço em perspectiva — plano de portfólio
+# Pricing in Perspective — Portfolio Plan
 
-## Objetivo
+## Purpose
 
-Transformar a calculadora estática em uma ferramenta local demonstrável de precificação para vendedores: entender quanto uma venda gera após taxas, descontar custos e comparar alternativas. Evidenciar React, TypeScript, modelagem monetária e acabamento de interface sem conectar contas reais.
+Turn the original static Shopee fee calculator into a demonstrable local pricing tool: understand revenue after fees, subtract modeled costs and compare alternatives. Demonstrate React, TypeScript, integer monetary modeling and a responsive interface without connecting real accounts.
 
-## Estado inicial
+## Original delivery and preserved resources
 
-- Checkout com README, index.html, script.js, style.css e test.html; sem build ou dependências.
-- Dois modos úteis: calcular a partir do preço e estimar preço a partir do valor após taxas; atualização ao editar; decomposição das taxas; BRL.
-- Hipóteses históricas: 12% comissão, 2% transação, 6% opcional, 2% campanha; R$ 4/R$ 5 fixos, metade do preço abaixo de R$ 8, teto de R$ 100 por item.
-- Quantidade afetava taxa fixa e teto, mas não multiplicava receita e percentuais. A chamada margem de lucro não descontava custos. Inversão usava até cinco iterações.
-- Harness histórico dependia de elementos ausentes. Não foi corrigido nem executado nesta tarefa.
-- Nenhum AGENTS.md adicional encontrado no checkout. Seguidas as instruções de sessão e RTK.md.
+The original checkout contained README, index.html, script.js, style.css and test.html, with no build dependencies. Its useful behaviors included direct and inverse calculations, immediate updates, a fee breakdown and BRL formatting. Historical assumptions were 12% commission, 2% transaction, optional 6% shipping and 2% campaign, R$4/R$5 fixed fees, half-price item fees below R$8 and a R$100 cap. These are historical code assumptions, not verified current platform rules.
 
-## Etapas
+Quantity previously multiplied the fixed fee and cap without multiplying revenue or percentage fees. The former profit margin omitted costs. Inverse pricing used up to five iterations. The archived test harness depended on missing form elements and remains a historical reference.
 
-1. **Preservar e documentar:** página anterior em legacy.html, script.js e style.css mantidos; aviso visível de arquivo histórico. README atualizado.
-2. **Motor independente:** centavos inteiros, percentuais em pontos-base, limites explícitos, quantidade inteira, custos e taxas por unidade, totais por lote, inversão por lucro real.
-3. **Interface local:** React + TypeScript + Vite, dois modos, decomposição financeira, edição de taxas/teto, até quatro snapshots de cenários e exemplo fictício.
-4. **Verificação autorizada:** revisão estática pelo agente principal e worker headless, sintaxe, typecheck, build e diff. Sem adicionar ou executar testes.
-5. **Revisão posterior:** validar interface visualmente e por teclado no navegador autorizado, revisar regras oficiais de qualquer marketplace antes de criar presets atuais, avaliar persistência/exportação, preparar GIF e publicação somente após revisão específica.
+The initial upgrade was prepared in the existing `portfolio-pricing-calculator` sibling checkout on October 8, 2026. All files were preserved in commit `4220fc1` and fast-forwarded into the default `master` checkout on October 9, 2026. Subsequent maintenance takes place directly on the default branch. No new worktree or branch was created.
 
-## Decisões de produto e design
+## Delivered stages
 
-- Skill utilizada: `/Users/felipealves/.agents/skills/frontend-design/SKILL.md`.
-- Paleta: fundo frio `#edf2f6`, superfície `#ffffff`, texto `#243746`, petróleo `#164e63`, lucro `#147568`, taxas `#cc953c`.
-- Tipografia local Avenir Next/Avenir com Segoe UI de fallback; sem fontes remotas.
-- Bancada alinhada à esquerda: edição à esquerda, resultado à direita, comparação abaixo. Em telas pequenas, uma coluna; comparação com rolagem horizontal.
-- Elemento distintivo: composição da receita com barra de custos, taxas e lucro, reforçada por valores textuais. Prejuízo ganha texto e cor próprios.
-- Crítica prévia: removida a ideia de cards repetidos por métrica; decomposição contábil contínua facilita reconciliar números. Sem grandes blocos promocionais ou gradientes.
+1. Preserve the prior page as `legacy.html` with a visible archive warning; retain script.js, style.css and test.html.
+2. Provide a pure calculation engine with integer cents, basis points, explicit limits, batch quantity, costs and fees per unit, and inverse pricing for profit after costs.
+3. Provide a React + TypeScript + Vite interface with two modes, reconciled financial breakdown, editable rates/cap, up to four immutable scenario snapshots, removal and a fictional example.
+4. Integrate into the default checkout, add meaningful calculation tests, translate documentation and register canonical portfolio preferences in AGENTS.md.
+5. Verify the production build and the local application flow; push normally and inspect existing CI without deploying publicly.
 
-## Critérios de entrega desta versão
+## Design decisions retained
 
-- [x] React + TypeScript executável localmente, sem credenciais.
-- [x] Custo do produto, embalagem, quantidade, taxas percentuais, taxa fixa e teto editáveis.
-- [x] Preço unitário ou lucro líquido total desejado; separação de receita líquida e lucro.
-- [x] BRL, vírgula/ponto decimal, até duas casas, sem truncar quantidade ou aceitar entradas vazias silenciosamente.
-- [x] Comparação de até quatro cenários imutáveis na sessão, remoção e retorno ao exemplo.
-- [x] Preset explicitamente demonstrativo; nenhuma regra apresentada como tarifa atual.
-- [x] Histórico preservado e mudanças de semântica documentadas.
-- [x] Worker headless iniciado, sem ativar/trocar tela Orca.
-- [x] Registrar resultados finais dos checks e da revisão estática abaixo.
-- [ ] Revisão visual/interativa posterior; não faz parte das verificações executadas neste turno.
+The initial delivery used the frontend-design skill. The palette uses cool background `#edf2f6`, white surfaces, text `#243746`, petroleum `#164e63`, profit `#147568` and fees `#cc953c`. Typography uses local Avenir Next/Avenir with Segoe UI fallbacks and no remote font requests.
 
-## Limites e riscos conhecidos
+The workbench places editing on the left, results on the right and comparison below. Small screens use a single column and a horizontally scrollable comparison table. A revenue allocation bar complements textual values; losses have their own text and color. A continuous financial breakdown avoids repeated metric cards and makes reconciliation explicit.
 
-- Sem conexão com Shopee, consulta de taxas oficiais, backend, persistência ou exportação. Não houve tentativa de verificar regras atuais: o escopo entregue é um simulador genérico demonstrativo.
-- Preset usa 12% + 2% + 6%, R$ 4 e teto R$ 100 apenas como dados de demonstração. Regra histórica abaixo de R$ 8 e opção CPF permanecem somente no legado.
-- Arredondamento percentual agregado por unidade; plataformas reais podem usar outra base ou ordem de arredondamento. O teto aplica-se ao conjunto das taxas configuradas.
-- Apenas produto/embalagem são custos modelados. Frete real, tributos, publicidade, devoluções e despesas operacionais precisam ser incorporados ou considerados separadamente.
-- Inputs monetários limitados a R$ 1 milhão, quantidade a 10.000 e soma percentual menor que 100%; lucro desejado não negativo. A venda pode resultar em prejuízo.
-- Build estático não comprova interação, acessibilidade ou layout em navegador. Não adicionar/executar testes nesta tarefa foi uma restrição expressa do usuário.
-- Deploy público e GIF aguardam revisão posterior. Sem push, merge, alteração de perfil GitHub ou escrita no Obsidian.
+## Acceptance and verification
 
-## Roteiro fictício de demonstração
+- React + strict TypeScript runs locally without credentials.
+- Product cost, packaging, quantity, percentages, fixed fee and cap are editable.
+- Direct pricing and inverse batch profit targets distinguish net revenue from profit.
+- Decimal comma/point parsing and BRL formatting retain exact cents; invalid input blocks saving.
+- Up to four snapshots remain unchanged when inputs change; removal frees capacity and reset preserves comparison.
+- The preset explicitly disclaims current Shopee rates and external connections.
+- Historical assets and calculation semantics are documented.
+- `npm test`: 10 passing behavioral tests for rounding, revenue/profit, quantity, caps, zero values, losses, minimal inverse prices, parsing and limits.
+- `npm run build`: TypeScript check and Vite production build passed on October 9, 2026, using Vite 7.3.7; 30 modules transformed.
+- `git diff --check`: passed before delivery commits.
+- Local Orca browser checks exercised input updates, profit inversion, snapshots, comparison capacity, removal, zero values, errors, loss, cap changes, quantity and reload behavior. Buttons required Orca DOM activation because typed click/key commands did not activate them in the tested embedded tab. Actual desktop (1361 × 948) and narrow-screen (390 × 844) viewport captures were reviewed. The narrow viewport had document width 390 with no page-level horizontal overflow. Physical pointer/keyboard, real mobile-device and screen-reader testing remain open.
 
-1. Carregar exemplo: produto R$ 32, embalagem R$ 2,50, uma unidade a R$ 79,90, 20% percentuais e R$ 4 fixos. Taxas R$ 19,98, receita líquida R$ 59,92, lucro R$ 25,42.
-2. Salvar como “Preço atual”. Alterar preço para R$ 69,90 e salvar “Promoção”: lucro R$ 17,42.
-3. Selecionar “Quero um lucro”, meta R$ 25: preço mínimo R$ 79,37, lucro R$ 25,00 pelo arredondamento adotado. Salvar “Meta de lucro”.
-4. Alterar quantidade para 3: a meta continua sendo total do lote. Comparar quantidades com atenção aos totais e preço unitário.
-5. Alterar custos/taxas ou desligar o teto para discutir sensibilidade. Cenários anteriores não mudam.
+The October 8 preparation did not add or execute tests because that earlier task excluded them; the October 9 integration explicitly authorized tests and replaces that limitation. Earlier preparation checks included build/typecheck, original JavaScript syntax and static reviews; those historical observations are not evidence of current marketplace rates.
 
-## Registro de verificação
+## Fictional demonstration
 
-Verificação realizada em 2026-10-08, neste checkout, com Node v26.8.2:
+1. Load the example: product R$32.00, packaging R$2.50, one unit priced at R$79.90, 20% combined rates and R$4.00 fixed fee. Fees R$19.98, net revenue R$59.92, profit R$25.42.
+2. Save “Current price”. Set R$69.90 and save “Promotion”: profit R$17.42.
+3. Choose “Quero um lucro”, target R$25.00: minimum unit price R$79.37, modeled profit R$25.00. Save “Profit target”.
+4. Set quantity to 3: the target remains total batch profit. In direct mode at R$79.90, batch net revenue is R$179.76 and profit R$76.26.
+5. Edit fees or disable the cap to discuss sensitivity; earlier snapshots remain unchanged. Save four scenarios, check the limit, remove one and verify capacity returns.
+6. Test zero costs/fees, zero price and quantity validation, a loss, and reload clearing the comparison.
 
-- `rtk npm install`: concluído; 20 pacotes adicionados, auditoria informou zero vulnerabilidades. Lockfile gerado. npm informou script de instalação do esbuild ainda não listado em allowScripts; não foi alterada a política global e o build funcionou.
-- `rtk npm run build`: exit 0; executou `tsc --noEmit` e Vite 7.3.7, com 30 módulos transformados. Saída: HTML 0,60 kB, CSS 9,59 kB e JS 235,60 kB (gzip JS 73,78 kB).
-- `rtk proxy node --check script.js`: exit 0; somente sintaxe, sem executar funções históricas.
-- `rtk git diff --check`: exit 0.
-- `rtk proxy npm ls --depth=0`: exit 0; React/React DOM 19.3.0, TypeScript 5.9.3, Vite 7.3.7.
-- Revisão estática do principal e worker headless `/root/static_review`: sem bloqueios monetários encontrados; fórmulas/teto/quantidade reconciliados, limites dentro de inteiros seguros e busca inversa coerente com a função monotônica usada. Removido import CSS vazio e acrescentada quebra de valores longos para telas pequenas.
-- Revisão estática de interface: labels associados, botões com estado pressionado, foco visível, aviso de erro, anúncio de salvamento, tabela com cabeçalhos/caption e layouts por breakpoints. Isso não substitui avaliação em navegador ou com leitor de tela.
-- Nenhum teste adicionado ou executado; nenhum harness histórico aberto. Sem revisão visual/interativa, screenshots ou GIF.
-- Os valores do roteiro foram derivados por revisão das fórmulas; não representam testes executados.
+## Limitations and follow-up
 
-Artefatos ficam locais, sem commit/push/merge/deploy. Servidor iniciado com `rtk npm run dev -- --port 5173 --strictPort`; `rtk proxy lsof -nP -iTCP:5173 -sTCP:LISTEN` confirmou Node PID 43083 escutando somente em `127.0.0.1:5173`. Isso confirma o servidor, sem exercitar a aplicação. A sessão/tela do Orca não foi ativada ou trocada.
+No Shopee connection, current-rate lookup, backend, persistence or export. The preset uses 12% + 2% + 6%, R$4 fixed and R$100 cap only as demonstration data. Historical below-R$8 and CPF options remain exclusively in the archive. Only product and packaging costs are modeled; seller-paid shipping, taxes, advertising, returns and operating expenses are omitted. Real platforms can use different bases or rounding orders. This is not fiscal advice.
+
+The original demo on loopback port 5173 belongs to the preserved sibling checkout and remains running. The integration used an isolated production preview on port 5174; it does not deploy publicly. The archived HTML is available through the development server, not included in the production build.
+
+README artwork is assigned to the coordinator's later task. Actual desktop and narrow-screen screenshots are saved in `docs/screenshots/` with English captions. No substitute artwork was created. An optional short demo of comparison and inverse pricing, plus pointer/keyboard and real-device checks, remain open. Any generated README art must be labeled as illustration and kept distinct from actual interface screenshots. No new documentation translation remains pending.
+
+The repo has no LICENSE file; do not assume MIT licensing. AGENTS.md is the canonical instruction file for future portfolio work.
